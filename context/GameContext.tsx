@@ -1,28 +1,36 @@
 import React, { createContext, useContext, useEffect, useReducer } from 'react';
-import { GameState, ClubName, Shot, RoundHoleData, ViewState } from '../types';
+import { GameState, ClubName, Shot, RoundHoleData, ViewState, FinishedRound } from '../types';
 
 // --- Actions ---
 type Action =
   | { type: 'LOAD_STATE'; payload: GameState }
   | { type: 'SET_BAG'; payload: ClubName[] }
   | { type: 'SET_VIEW'; payload: ViewState }
+  | { type: 'SET_USER_NAME'; payload: string }
+  | { type: 'SET_HOME_BACKGROUND'; payload: string | null }
   | { type: 'START_HOLE'; payload: { hole: number; par: number } }
   | { type: 'ADD_SHOT'; payload: Shot }
   | { type: 'UPDATE_SHOT'; payload: { index: number; shot: Shot } }
   | { type: 'DELETE_SHOT'; payload: number } // Index
   | { type: 'FINISH_HOLE'; payload: RoundHoleData }
   | { type: 'EDIT_HOLE'; payload: { index: number; data: RoundHoleData } }
+  | { type: 'ARCHIVE_ROUND'; payload: { courseName: string; date: string } }
   | { type: 'RESUME_GAME' }
-  | { type: 'RESET_GAME' };
+  | { type: 'RESET_GAME' }
+  | { type: 'DELETE_ROUND'; payload: number } // CHANGED: Using Index for absolute reliability
+  | { type: 'CLEAR_HISTORY' };
 
 // --- Initial State ---
 const initialState: GameState = {
-  view: 'BAG_SETUP',
+  view: 'HOME',
   myBag: ["Driver", "Hybrid", "7 Iron", "8 Iron", "9 Iron", "PW", "SW", "Putter"],
+  userName: "Golfer",
+  homeBackgroundImage: null,
   currentHole: 1,
   currentPar: 4,
   currentShots: [],
   history: [],
+  pastRounds: [],
   isEditingMode: false,
   editingHoleIndex: -1,
   maxHoleReached: 1,
@@ -31,19 +39,30 @@ const initialState: GameState = {
 // --- Reducer ---
 const gameReducer = (state: GameState, action: Action): GameState => {
   switch (action.type) {
-    case 'LOAD_STATE':
-      return { ...action.payload };
+    case 'LOAD_STATE': {
+      // Data hygiene: Ensure pastRounds is always an array
+      const safePastRounds = Array.isArray(action.payload.pastRounds) ? action.payload.pastRounds : [];
+      return { 
+        ...initialState, 
+        ...action.payload,
+        homeBackgroundImage: action.payload.homeBackgroundImage || null,
+        pastRounds: safePastRounds 
+      };
+    }
     case 'SET_BAG':
-      // Only update the bag, do not change view automatically
       return { ...state, myBag: action.payload };
     case 'SET_VIEW':
       return { ...state, view: action.payload };
+    case 'SET_USER_NAME':
+      return { ...state, userName: action.payload };
+    case 'SET_HOME_BACKGROUND':
+      return { ...state, homeBackgroundImage: action.payload };
     case 'START_HOLE':
       return {
         ...state,
         currentHole: action.payload.hole,
         currentPar: action.payload.par,
-        currentShots: [], // Clear shots for new hole
+        currentShots: [], 
         view: 'PLAY',
         isEditingMode: false,
       };
@@ -60,7 +79,6 @@ const gameReducer = (state: GameState, action: Action): GameState => {
       return { ...state, currentShots: newShots };
     }
     case 'FINISH_HOLE': {
-      // If we are editing, update history at index
       if (state.isEditingMode && state.editingHoleIndex !== -1) {
         const newHistory = [...state.history];
         newHistory[state.editingHoleIndex] = action.payload;
@@ -69,11 +87,9 @@ const gameReducer = (state: GameState, action: Action): GameState => {
           history: newHistory,
           isEditingMode: false,
           editingHoleIndex: -1,
-          view: 'ANALYSIS', // Go to analysis to confirm changes
+          view: 'ANALYSIS',
         };
       }
-
-      // Normal play
       const newHistory = [...state.history, action.payload];
       const nextHole = state.currentHole + 1;
       return {
@@ -81,7 +97,7 @@ const gameReducer = (state: GameState, action: Action): GameState => {
         history: newHistory,
         maxHoleReached: nextHole,
         currentHole: nextHole,
-        currentShots: [], // clear
+        currentShots: [],
         view: nextHole > 18 ? 'ANALYSIS' : 'HOLE_SETUP',
       };
     }
@@ -92,20 +108,82 @@ const gameReducer = (state: GameState, action: Action): GameState => {
         editingHoleIndex: action.payload.index,
         currentHole: action.payload.data.holeNumber,
         currentPar: action.payload.data.par,
-        currentShots: [...action.payload.data.shots], // Deep copy shots
+        currentShots: [...action.payload.data.shots],
         view: 'PLAY',
       };
+    case 'ARCHIVE_ROUND': {
+      const totalScore = state.history.reduce((acc, h) => acc + h.score, 0);
+      const totalPar = state.history.reduce((acc, h) => acc + h.par, 0);
+      const totalPutts = state.history.reduce((acc, h) => acc + h.putts, 0);
+      
+      const newRound: FinishedRound = {
+        id: `round_${Date.now()}`,
+        courseName: action.payload.courseName,
+        date: action.payload.date,
+        playerName: state.userName,
+        holes: [...state.history],
+        totalScore,
+        totalPar,
+        totalPutts
+      };
+
+      // Explicitly reset game state while keeping user prefs and adding new round
+      return {
+        ...state,
+        currentHole: 1,
+        currentPar: 4,
+        currentShots: [],
+        history: [],
+        isEditingMode: false,
+        editingHoleIndex: -1,
+        maxHoleReached: 1,
+        pastRounds: [newRound, ...state.pastRounds], // Add to TOP of list
+        view: 'PAST_GAMES' 
+      };
+    }
     case 'RESUME_GAME':
+      if (state.history.length >= 18) {
+        return { ...state, isEditingMode: false, editingHoleIndex: -1, view: 'ANALYSIS' };
+      }
       return {
         ...state,
         isEditingMode: false,
         editingHoleIndex: -1,
         currentHole: state.maxHoleReached,
-        currentShots: [], // Reset current shots (simplified logic)
+        currentShots: [],
         view: 'HOLE_SETUP',
       };
     case 'RESET_GAME':
-      return { ...initialState, myBag: state.myBag }; // Keep bag settings
+      // Explicitly clearing data fields ensures "Discard" works as expected
+      return { 
+        ...state,
+        view: 'HOME',
+        currentHole: 1,
+        currentPar: 4,
+        currentShots: [],
+        history: [],
+        isEditingMode: false,
+        editingHoleIndex: -1,
+        maxHoleReached: 1,
+        // Preserve these:
+        myBag: state.myBag, 
+        userName: state.userName, 
+        homeBackgroundImage: state.homeBackgroundImage,
+        pastRounds: state.pastRounds 
+      }; 
+    case 'DELETE_ROUND': {
+      // Delete by Index: The most reliable method for this app structure
+      const newRounds = [...state.pastRounds];
+      if (action.payload >= 0 && action.payload < newRounds.length) {
+        newRounds.splice(action.payload, 1);
+      }
+      return { 
+          ...state, 
+          pastRounds: newRounds 
+      };
+    }
+    case 'CLEAR_HISTORY':
+      return { ...state, pastRounds: [] };
     default:
       return state;
   }
@@ -119,12 +197,11 @@ interface GameContextProps {
 
 const GameContext = createContext<GameContextProps | undefined>(undefined);
 
-const LOCAL_STORAGE_KEY = 'golf_master_pro_v1';
+const LOCAL_STORAGE_KEY = 'golf_master_pro_v2'; 
 
 export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [state, dispatch] = useReducer(gameReducer, initialState);
 
-  // Load from local storage on mount
   useEffect(() => {
     const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
     if (saved) {
@@ -137,7 +214,6 @@ export const GameProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, []);
 
-  // Save to local storage on change
   useEffect(() => {
     localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
   }, [state]);

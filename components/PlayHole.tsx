@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useGame } from '../context/GameContext';
 import { ClubName, Shot } from '../types';
-import { Trash2, Edit2, CheckCircle, X, ChevronDown } from 'lucide-react';
+import { Trash2, Edit2, CheckCircle, X, ChevronDown, Flag } from 'lucide-react';
 
 export const PlayHole: React.FC = () => {
   const { state, dispatch } = useGame();
@@ -19,6 +19,7 @@ export const PlayHole: React.FC = () => {
   // --- Helpers ---
   const currentScore = state.currentShots.length;
   const putts = state.currentShots.filter(s => s.club === 'Putter').length;
+  const isLastHole = state.currentHole === 18;
 
   useEffect(() => {
     if (showEditModal && distInputRef.current) {
@@ -202,7 +203,13 @@ export const PlayHole: React.FC = () => {
                 onClick={handleFinishHole}
                 className={`flex-1 py-3 rounded-xl font-bold text-lg shadow-lg active:scale-[0.98] transition-all flex items-center justify-center gap-2 ${state.isEditingMode ? 'bg-orange-500 text-white' : 'bg-primary text-white'}`}
               >
-                {state.isEditingMode ? 'Save Changes' : 'Next Hole'} <CheckCircle size={20} />
+                {state.isEditingMode ? (
+                  'Save Changes'
+                ) : isLastHole ? (
+                  <>Finish Round <Flag size={20} fill="currentColor" /></>
+                ) : (
+                  <>Next Hole <CheckCircle size={20} /></>
+                )}
               </button>
           </div>
       </div>

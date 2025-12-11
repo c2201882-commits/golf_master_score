@@ -1,9 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
-import { Download, ChevronRight, Play } from 'lucide-react';
+import { Download, ChevronRight, Play, Save, Trash2, Trophy } from 'lucide-react';
 
 export const Analysis: React.FC = () => {
   const { state, dispatch } = useGame();
+  
+  const [courseName, setCourseName] = useState('');
+  const [date, setDate] = useState(new Date().toISOString().slice(0, 10)); // YYYY-MM-DD
 
   // Stats Calcs
   const totalScore = state.history.reduce((acc, h) => acc + h.score, 0);
@@ -18,6 +21,7 @@ export const Analysis: React.FC = () => {
     if (state.history.length === 0) return;
     
     let csvContent = "data:text/csv;charset=utf-8,\uFEFF";
+    csvContent += `Player,${state.userName}\nCourse,${courseName || 'Unknown'}\nDate,${date}\n\n`;
     csvContent += "Hole,Par,Score,Putts,GIR,Shot Number,Club,Distance\n";
     
     state.history.forEach(h => {
@@ -29,16 +33,44 @@ export const Analysis: React.FC = () => {
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", `golf_scorecard_${new Date().toISOString().slice(0,10)}.csv`);
+    link.setAttribute("download", `golf_scorecard_${date}.csv`);
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
   };
 
+  const handleFinishGame = (e: React.FormEvent) => {
+    e.preventDefault();
+    if(!courseName.trim()) {
+        alert("Please enter a course name.");
+        return;
+    }
+    
+    // Direct save without second confirm, as filling the form is intentional enough
+    dispatch({
+        type: 'ARCHIVE_ROUND',
+        payload: {
+            courseName: courseName.trim(),
+            date: date
+        }
+    });
+  };
+
+  const handleDiscardGame = () => {
+      if(confirm("Are you sure you want to discard this round? All data for this session will be lost.")) {
+          // This calls the enhanced RESET_GAME reducer which wipes all current game data
+          dispatch({ type: 'RESET_GAME' });
+      }
+  };
+
   return (
     <div className="px-4 pt-4 pb-safe-bottom max-w-2xl mx-auto">
+      {/* Score Header */}
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
-        <h2 className="text-xl font-bold text-gray-800 mb-6">Round Summary</h2>
+        <h2 className="text-xl font-bold text-gray-800 mb-6 flex justify-between">
+            <span>Current Round</span>
+            <span className="text-primary text-base font-normal">{state.userName}</span>
+        </h2>
         
         <div className="grid grid-cols-2 gap-4 text-center">
             <div className="bg-gray-50 rounded-xl p-4">
@@ -67,7 +99,7 @@ export const Analysis: React.FC = () => {
       <div className="flex gap-3 mb-6">
           <button 
              onClick={downloadCSV}
-             className="flex-1 bg-blue-500 text-white py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform shadow-md shadow-blue-200"
+             className="flex-1 bg-blue-50 text-blue-600 py-3 px-4 rounded-xl font-bold flex items-center justify-center gap-2 active:scale-95 transition-transform border border-blue-200"
           >
               <Download size={18} /> Export CSV
           </button>
@@ -82,7 +114,8 @@ export const Analysis: React.FC = () => {
           )}
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      {/* Hole Table */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden mb-8">
           <table className="w-full text-sm">
               <thead className="bg-primary text-white">
                   <tr>
@@ -124,19 +157,61 @@ export const Analysis: React.FC = () => {
           )}
       </div>
       
-      {state.history.length === 18 && (
-        <div className="mt-8 mb-8">
-            <button 
-              onClick={() => {
-                if(confirm("Start a new game? Current data will be cleared unless you exported it.")) {
-                    dispatch({ type: 'RESET_GAME' });
-                }
-              }}
-              className="w-full border-2 border-primary text-primary py-3 rounded-xl font-bold active:scale-95 transition-all"
-            >
-                Start New Game
-            </button>
+      {/* End Game / Archive Section */}
+      {state.history.length > 0 && (
+        <div className="bg-gray-900 text-white p-6 rounded-2xl mb-8 shadow-lg">
+            <h3 className="text-lg font-bold mb-4 flex items-center gap-2">
+                <Trophy size={20} className="text-yellow-400" />
+                Finish & Save Round
+            </h3>
+            <p className="text-sm text-gray-300 mb-6">
+                Enter details below to permanently save this round to your history.
+            </p>
+            
+            <form onSubmit={handleFinishGame} className="space-y-4">
+                <div>
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">Course Name</label>
+                    <input 
+                        required
+                        type="text" 
+                        value={courseName}
+                        onChange={(e) => setCourseName(e.target.value)}
+                        placeholder="e.g. Pebble Beach"
+                        className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-green-500 text-white placeholder-gray-500"
+                    />
+                </div>
+                
+                <div>
+                    <label className="block text-xs font-bold text-gray-400 uppercase tracking-wide mb-1">Date played</label>
+                    <input 
+                        required
+                        type="date" 
+                        value={date}
+                        onChange={(e) => setDate(e.target.value)}
+                        className="w-full bg-gray-800 border border-gray-700 rounded-xl px-4 py-3 focus:outline-none focus:border-green-500 text-white"
+                    />
+                </div>
+
+                <button 
+                  type="submit"
+                  className="w-full bg-green-600 hover:bg-green-500 text-white py-4 rounded-xl font-bold text-lg shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2 mt-2"
+                >
+                    <Save size={20} /> Save to History
+                </button>
+            </form>
         </div>
+      )}
+
+      {/* Discard Section */}
+      {state.history.length > 0 && (
+          <div className="mb-8 text-center">
+            <button 
+                onClick={handleDiscardGame}
+                className="text-red-400 text-sm font-semibold flex items-center justify-center gap-2 mx-auto hover:text-red-500 px-4 py-2 border border-red-100 rounded-lg hover:bg-red-50 transition-colors"
+            >
+                <Trash2 size={16} /> Discard round & start new
+            </button>
+          </div>
       )}
     </div>
   );

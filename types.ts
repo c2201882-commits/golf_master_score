@@ -1,4 +1,4 @@
-export type ViewState = 'BAG_SETUP' | 'HOLE_SETUP' | 'PLAY' | 'ANALYSIS';
+export type ViewState = 'HOME' | 'BAG_SETUP' | 'HOLE_SETUP' | 'PLAY' | 'ANALYSIS' | 'PAST_GAMES';
 
 // Allow any string for custom clubs, but keep the type alias for clarity
 export type ClubName = string;
@@ -20,15 +20,35 @@ export interface RoundHoleData {
   date: string;
 }
 
+export interface FinishedRound {
+  id: string;
+  courseName: string;
+  date: string;
+  playerName: string;
+  holes: RoundHoleData[];
+  totalScore: number;
+  totalPar: number;
+  totalPutts: number;
+}
+
 export interface GameState {
   view: ViewState;
   myBag: ClubName[];
+  userName: string; // User's name
+  
+  // Customization
+  homeBackgroundImage?: string | null; // Base64 data string
+
+  // Current Game State
   currentHole: number;
   currentPar: number;
   currentShots: Shot[];
   history: RoundHoleData[];
   
-  // Editing state
+  // Persistent History
+  pastRounds: FinishedRound[];
+
+  // Editing state for current game
   isEditingMode: boolean;
   editingHoleIndex: number; // Index in history array
   maxHoleReached: number;

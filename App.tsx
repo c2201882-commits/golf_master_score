@@ -5,12 +5,16 @@ import { BagSelection } from './components/BagSelection';
 import { HoleSetup } from './components/HoleSetup';
 import { PlayHole } from './components/PlayHole';
 import { Analysis } from './components/Analysis';
+import { PastGames } from './components/PastGames';
+import { Home } from './components/Home';
 
 const Main: React.FC = () => {
   const { state } = useGame();
 
   const renderView = () => {
     switch (state.view) {
+      case 'HOME':
+        return <Home />;
       case 'BAG_SETUP':
         return <BagSelection />;
       case 'HOLE_SETUP':
@@ -19,8 +23,10 @@ const Main: React.FC = () => {
         return <PlayHole />;
       case 'ANALYSIS':
         return <Analysis />;
+      case 'PAST_GAMES':
+        return <PastGames />;
       default:
-        return <BagSelection />;
+        return <Home />;
     }
   };
 
