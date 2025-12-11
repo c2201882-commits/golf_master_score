@@ -189,7 +189,7 @@ export const PlayHole: React.FC = () => {
       </div>
 
       {/* Sticky Bottom Action */}
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t pb-safe-bottom z-20">
+      <div className="fixed bottom-0 left-0 right-0 px-4 pt-4 pb-safe-bottom bg-white border-t z-20">
           <div className="flex gap-3">
               <button 
                  onClick={() => dispatch({type: 'DELETE_SHOT', payload: state.currentShots.length - 1})}

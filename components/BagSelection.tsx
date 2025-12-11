@@ -107,7 +107,7 @@ export const BagSelection: React.FC = () => {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t pb-safe-bottom shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-10">
+      <div className="fixed bottom-0 left-0 right-0 px-4 pt-4 pb-safe-bottom bg-white border-t shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] z-10">
         <button 
           onClick={confirm}
           className="w-full bg-primary text-white py-3.5 rounded-xl font-bold text-lg shadow-lg active:scale-[0.98] transition-transform"

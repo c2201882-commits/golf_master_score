@@ -47,6 +47,19 @@
         overscroll-behavior-y: none; /* Prevent pull-to-refresh on mobile */
         -webkit-tap-highlight-color: transparent;
       }
+
+      /* --- Safe Area Utilities --- */
+      /* Adds standard 1rem (16px) padding PLUS the device safe area */
+      
+      .pt-safe-top {
+        padding-top: 1rem; /* Fallback */
+        padding-top: calc(1rem + env(safe-area-inset-top));
+      }
+
+      .pb-safe-bottom {
+        padding-bottom: 1rem; /* Fallback */
+        padding-bottom: calc(1rem + env(safe-area-inset-bottom));
+      }
     </style>
   <script type="importmap">
 {

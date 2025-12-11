@@ -36,7 +36,7 @@ export const Analysis: React.FC = () => {
   };
 
   return (
-    <div className="p-4 max-w-2xl mx-auto pb-safe-bottom">
+    <div className="px-4 pt-4 pb-safe-bottom max-w-2xl mx-auto">
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 mb-6">
         <h2 className="text-xl font-bold text-gray-800 mb-6">Round Summary</h2>
         

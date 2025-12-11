@@ -20,7 +20,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <div className="flex flex-col h-full bg-gray-50">
       {/* Header */}
-      <header className="bg-primary text-white p-4 pt-safe-top pb-3 flex items-center justify-between shadow-md z-30 sticky top-0">
+      {/* Changed p-4 to px-4 pb-3, and used custom pt-safe-top for dynamic top padding */}
+      <header className="bg-primary text-white px-4 pb-3 pt-safe-top flex items-center justify-between shadow-md z-30 sticky top-0">
         <button onClick={toggleMenu} className="p-1 hover:bg-green-700 rounded transition-colors">
           <Menu size={24} />
         </button>
@@ -43,7 +44,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
       {/* Side Menu Drawer */}
       <div className={`fixed top-0 left-0 bottom-0 w-72 bg-white z-50 transform transition-transform duration-300 shadow-2xl ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="p-4 bg-primary text-white flex justify-between items-center pt-safe-top">
+        {/* Changed p-4 to px-4 pb-4, allowing pt-safe-top to handle top spacing */}
+        <div className="px-4 pb-4 bg-primary text-white flex justify-between items-center pt-safe-top">
           <span className="font-bold text-xl">Menu</span>
           <button onClick={toggleMenu}><X size={24} /></button>
         </div>
