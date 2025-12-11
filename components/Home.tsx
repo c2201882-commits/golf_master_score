@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useGame } from '../context/GameContext';
-import { Play, History, Image as ImageIcon, Trash2 } from 'lucide-react';
+import { Play, History, Image as ImageIcon, Trash2, Instagram } from 'lucide-react';
 
 export const Home: React.FC = () => {
   const { state, dispatch } = useGame();
@@ -63,9 +63,23 @@ export const Home: React.FC = () => {
                 <h1 className={`text-3xl font-black tracking-tight mb-2 ${hasBackground ? 'text-white drop-shadow-md' : 'text-gray-800'}`}>
                     Golf Master Pro
                 </h1>
-                <p className={`font-medium ${hasBackground ? 'text-gray-200' : 'text-gray-500'}`}>
+                <p className={`font-medium mb-3 ${hasBackground ? 'text-gray-200' : 'text-gray-500'}`}>
                     Your personal caddie & tracker
                 </p>
+                
+                {/* IG Link */}
+                <a 
+                    href="https://www.instagram.com/eric820709/" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className={`inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1.5 rounded-full border transition-all active:scale-95
+                        ${hasBackground 
+                            ? 'bg-white/20 text-white border-white/30 hover:bg-white/30' 
+                            : 'bg-white text-pink-600 border-pink-100 hover:bg-pink-50 shadow-sm'}`}
+                >
+                    <Instagram size={14} />
+                    IG: eric820709
+                </a>
             </div>
 
             {/* Main Actions */}

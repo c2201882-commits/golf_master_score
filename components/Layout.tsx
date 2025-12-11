@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useGame } from '../context/GameContext';
-import { Menu, X, BarChart2, Home, User, History, Grid } from 'lucide-react';
+import { Menu, X, BarChart2, Home, User, History, Grid, Instagram } from 'lucide-react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -121,8 +121,16 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </button>
           </div>
           
-          <div className="mt-auto p-4 text-xs text-gray-300 text-center">
-             Golf Master Pro v1.2
+          <div className="mt-auto p-4 text-center border-t border-gray-100 bg-gray-50">
+             <div className="text-xs text-gray-400 mb-2">Golf Master Pro v1.2</div>
+             <a 
+               href="https://www.instagram.com/eric820709/" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               className="inline-flex items-center gap-1.5 text-xs font-bold text-pink-600 hover:text-pink-700 transition-colors bg-white px-3 py-1.5 rounded-full border border-pink-100 shadow-sm"
+             >
+                <Instagram size={14} /> IG: eric820709
+             </a>
           </div>
         </div>
       </div>
