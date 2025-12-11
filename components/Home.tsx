@@ -37,24 +37,24 @@ export const Home: React.FC = () => {
   };
 
   return (
-    <div className="relative flex flex-col h-full overflow-hidden transition-all duration-500">
+    <div className="relative flex flex-col min-h-full transition-all duration-500">
       
       {/* Dynamic Background */}
       {hasBackground ? (
           <div 
-            className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat"
+            className="absolute inset-0 z-0 bg-cover bg-center bg-no-repeat fixed"
             style={{ backgroundImage: `url(${state.homeBackgroundImage})` }}
           >
               <div className="absolute inset-0 bg-black/40 backdrop-blur-[1px]"></div>
           </div>
       ) : (
-          <div className="absolute inset-0 z-0 bg-gray-50"></div>
+          <div className="absolute inset-0 z-0 bg-gray-50 fixed"></div>
       )}
 
       {/* Content Layer */}
-      <div className="relative z-10 flex flex-col h-full px-6 pt-safe-top pb-safe-bottom">
+      <div className="relative z-10 flex flex-col min-h-full px-6 pt-safe-top pb-safe-bottom">
         
-        <div className="flex-1 flex flex-col items-center justify-center space-y-8 animate-fade-in">
+        <div className="flex-1 flex flex-col items-center justify-center space-y-8 animate-fade-in py-8">
             {/* Logo / Branding */}
             <div className="text-center">
                 <div className={`w-24 h-24 rounded-full mx-auto mb-6 shadow-xl flex items-center justify-center border-4 ${hasBackground ? 'bg-white/90 border-white' : 'bg-white border-gray-100'}`}>
