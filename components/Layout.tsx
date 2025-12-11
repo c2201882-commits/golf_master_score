@@ -36,7 +36,7 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
     <div className="flex flex-col h-full bg-gray-50">
       {/* Header (Hidden on Home Screen for cleaner look, or kept minimal) */}
       {!isHome && (
-          <header className="bg-primary text-white px-4 pb-3 pt-safe-top flex items-center justify-between shadow-md z-30 sticky top-0">
+          <header className="bg-primary text-white px-4 pb-3 pt-safe-top flex items-center justify-between shadow-md z-30 sticky top-0 shrink-0">
             <button onClick={toggleMenu} className="p-1 hover:bg-green-700 rounded transition-colors">
               <Menu size={24} />
             </button>
@@ -59,16 +59,18 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
       )}
 
       {/* Side Menu Drawer */}
-      <div className={`fixed top-0 left-0 bottom-0 w-72 bg-white z-50 transform transition-transform duration-300 shadow-2xl ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="px-4 pb-4 bg-primary text-white flex justify-between items-center pt-safe-top">
+      <div className={`fixed top-0 left-0 bottom-0 w-72 bg-white z-50 transform transition-transform duration-300 shadow-2xl flex flex-col ${isMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        {/* Header */}
+        <div className="px-4 pb-4 bg-primary text-white flex justify-between items-center pt-safe-top shrink-0">
           <span className="font-bold text-xl">Menu</span>
           <button onClick={toggleMenu}><X size={24} /></button>
         </div>
         
-        <div className="flex flex-col h-full overflow-y-auto pb-20">
+        {/* Scrollable Content */}
+        <div className="flex flex-col flex-1 overflow-y-auto">
           
           {/* User Profile Section */}
-          <div className="p-4 bg-green-50 border-b border-green-100">
+          <div className="p-4 bg-green-50 border-b border-green-100 shrink-0">
              <div className="flex items-center gap-2 mb-2 text-primary font-bold">
                 <User size={18} />
                 <span>Golfer Profile</span>
@@ -91,7 +93,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
              )}
           </div>
 
-          <div className="p-4 space-y-2">
+          {/* Navigation Items */}
+          <div className="p-4 space-y-2 flex-1">
             
             <button 
               onClick={() => handleNav(() => dispatch({ type: 'SET_VIEW', payload: 'HOME' }))}
@@ -121,7 +124,8 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
             </button>
           </div>
           
-          <div className="mt-auto p-4 text-center border-t border-gray-100 bg-gray-50">
+          {/* Footer - Pushed to bottom with safe area padding */}
+          <div className="p-4 text-center border-t border-gray-100 bg-gray-50 pb-safe-bottom shrink-0">
              <div className="text-xs text-gray-400 mb-2">Golf Master Pro v1.2</div>
              <a 
                href="https://www.instagram.com/eric820709/" 
