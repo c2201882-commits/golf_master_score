@@ -3,7 +3,7 @@ import { useGame } from '../context/GameContext';
 import { Play, History, Image as ImageIcon, Trash2, Instagram } from 'lucide-react';
 
 export const Home: React.FC = () => {
-  const { state, dispatch } = useGame();
+  const { state, dispatch, t } = useGame();
   const fileInputRef = useRef<HTMLInputElement>(null);
   
   const hasActiveGame = state.history.length > 0 || state.currentShots.length > 0;
@@ -61,10 +61,10 @@ export const Home: React.FC = () => {
                     <span className="text-5xl">⛳️</span>
                 </div>
                 <h1 className={`text-3xl font-black tracking-tight mb-2 ${hasBackground ? 'text-white drop-shadow-md' : 'text-gray-800'}`}>
-                    Golf Master Pro
+                    {t('appTitle')}
                 </h1>
                 <p className={`font-medium mb-3 ${hasBackground ? 'text-gray-200' : 'text-gray-500'}`}>
-                    Your personal caddie & tracker
+                    {t('subtitle')}
                 </p>
                 
                 {/* IG Link */}
@@ -102,10 +102,10 @@ export const Home: React.FC = () => {
                         </div>
                         <div className="text-left">
                             <div className="text-sm font-medium opacity-90 uppercase tracking-wide">
-                                {hasActiveGame ? (isGameFinished ? 'Review Round' : 'Continue Round') : 'New Round'}
+                                {hasActiveGame ? (isGameFinished ? t('reviewRound') : t('continueRound')) : t('newRound')}
                             </div>
                             <div className="text-2xl font-bold">
-                                {hasActiveGame ? (isGameFinished ? 'Analysis' : 'Resume Game') : 'Start Game'}
+                                {hasActiveGame ? (isGameFinished ? t('analyzeRound') : t('resumeGame')) : t('startGame')}
                             </div>
                         </div>
                     </div>
@@ -126,8 +126,8 @@ export const Home: React.FC = () => {
                         <History size={20} />
                     </div>
                     <div className="text-left">
-                        <div className="text-lg font-bold">Past Games</div>
-                        <div className="text-xs text-gray-500 font-medium">{state.pastRounds.length} rounds archived</div>
+                        <div className="text-lg font-bold">{t('pastGames')}</div>
+                        <div className="text-xs text-gray-500 font-medium">{state.pastRounds.length} {t('roundsArchived')}</div>
                     </div>
                 </button>
             </div>
@@ -142,7 +142,7 @@ export const Home: React.FC = () => {
                     <UserIcon />
                 </div>
                 <div>
-                    <div className={`text-xs font-bold uppercase ${hasBackground ? 'text-gray-300' : 'text-gray-400'}`}>Player</div>
+                    <div className={`text-xs font-bold uppercase ${hasBackground ? 'text-gray-300' : 'text-gray-400'}`}>{t('player')}</div>
                     <div className="font-bold">{state.userName}</div>
                 </div>
             </div>
@@ -173,7 +173,7 @@ export const Home: React.FC = () => {
                         ${hasBackground ? 'bg-white/20 hover:bg-white/30 text-white' : 'bg-gray-100 hover:bg-gray-200 text-gray-600'}`}
                 >
                     <ImageIcon size={16} />
-                    {hasBackground ? 'Edit' : 'Bg'}
+                    {hasBackground ? t('edit') : 'Bg'}
                 </button>
             </div>
         </div>

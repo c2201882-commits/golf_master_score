@@ -4,7 +4,7 @@ import { ALL_POSSIBLE_CLUBS, ClubName } from '../types';
 import { Check, Plus, X } from 'lucide-react';
 
 export const BagSelection: React.FC = () => {
-  const { state, dispatch } = useGame();
+  const { state, dispatch, t } = useGame();
   const [customClub, setCustomClub] = useState('');
 
   const toggleClub = (club: ClubName) => {
@@ -44,8 +44,8 @@ export const BagSelection: React.FC = () => {
   return (
     <div className="p-4 max-w-lg mx-auto flex flex-col h-full">
       <div className="bg-white rounded-2xl shadow-sm p-6 mb-6 text-center shrink-0">
-        <h2 className="text-2xl font-bold text-primary mb-2">What's in your bag?</h2>
-        <p className="text-gray-500 text-sm">Select clubs or add your own.</p>
+        <h2 className="text-2xl font-bold text-primary mb-2">{t('bagTitle')}</h2>
+        <p className="text-gray-500 text-sm">{t('bagDesc')}</p>
       </div>
 
       <div className="flex-1 overflow-y-auto pb-24 no-scrollbar">
@@ -72,7 +72,7 @@ export const BagSelection: React.FC = () => {
 
         {/* Custom Clubs Section */}
         <div className="mb-8 px-2">
-          <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 text-center">Custom Clubs</div>
+          <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 text-center">{t('customClubs')}</div>
           
           <form onSubmit={addCustomClub} className="flex gap-2 mb-4">
             <input
@@ -112,7 +112,7 @@ export const BagSelection: React.FC = () => {
           onClick={confirm}
           className="w-full bg-primary text-white py-3.5 rounded-xl font-bold text-lg shadow-lg active:scale-[0.98] transition-transform"
         >
-          Start Game
+          {t('startGame')}
         </button>
       </div>
     </div>

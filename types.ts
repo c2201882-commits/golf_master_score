@@ -1,4 +1,5 @@
 export type ViewState = 'HOME' | 'BAG_SETUP' | 'HOLE_SETUP' | 'PLAY' | 'ANALYSIS' | 'PAST_GAMES';
+export type Language = 'en' | 'zh-TW';
 
 // Allow any string for custom clubs, but keep the type alias for clarity
 export type ClubName = string;
@@ -33,6 +34,7 @@ export interface FinishedRound {
 
 export interface GameState {
   view: ViewState;
+  language: Language; // Added language
   myBag: ClubName[];
   userName: string; // User's name
   
